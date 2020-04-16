@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>6 игра</title>
+    <style>
+        body{
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+
+        }
+        .box_wrapper {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            grid-template-columns: repeat(10, 25px);
+            grid-gap: 3px;
+            position: relative;
+            border: 3px solid black;
+            padding: 5px;
+        }
+
+        .box {
+            height: 25px;
+            width: 25px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: .3s;
+        }
+        .box_yes{
+            height: 25px;
+            width: 25px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(200,10,10,.7);
+
+        }
+        .box_no{
+            height: 25px;
+            width: 25px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
+        .box:hover{
+            transform: scale(1.1);
+            transition: .5s;
+        }
+        .button{
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+        .game_over{
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            font-size: 50px;
+            transform: translate(-50%,-50%);
+        }
+        .steps_counter{
+            position: absolute;
+            top: -40px;
+            left: 0;
+
+        }
+        .guessed_counter{
+            position: absolute;
+            top: -40px;
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+<button class="button">Start new game</button>
+
+<div class="box_wrapper">
+    <p class="steps_counter"></p>
+    <p class="guessed_counter"></p>
+</div>
+<script>
+    let gameWrapper = document.querySelector('.box_wrapper');
+    let myButton = document.querySelector('.button');
+    let myInfo = document.getElementsByTagName('p');
+
+    myButton.addEventListener('click', buttonClick);
+
+    let items = [];
+    let compareItems = [];
+
+    let steps = 0;
+    let guessed = 0;
+
+    for (let i = 0; i < 100; i++) {
+        let gameBox = document.createElement('div');
+        gameBox.addEventListener('click',       compare);
+        gameBox.className = ('box');
+        gameBox.innerHTML = i+1;
+        items.push(gameBox);
+    }
+
+    function buttonClick() {
+        myButton.style.display = 'none';
+        gameWrapper.style.display = 'grid';
+        renderBoxes();
+        steps = 20;
+        guessed = 0;
+        myInfo[0].innerText = `steps ${steps}`;
+        myInfo[1].innerText = `${guessed} guessed`;
+        compareItems = shuffle(items);
+        document.querySelector('.game_over').remove();
+    };
+
+    function compare(e) {
+        console.log(e.target);
+        steps--;
+        myInfo[0].innerText = `steps ${steps}`;
+
+        switch (e.target) {
+            case compareItems[0]:
+            case compareItems[1]:
+            case compareItems[2]:
+            case compareItems[3]:
+            case compareItems[4]:
+            case compareItems[5]:
+            case compareItems[6]:
+            case compareItems[7]:
+            case compareItems[8]:
+            case compareItems[9]:
+                e.target.classList.remove('box');
+                e.target.classList.add('box_yes');
+                e.target.innerHTML = '';
+                guessed++;
+                myInfo[1].innerText = `${guessed} guessed`;
+                break;
+            default:
+                e.target.classList.remove('box');
+                e.target.classList.add('box_no');
+                e.target.innerHTML = '';
+                break;
+
+        }
+        if(steps === 0){
+            gameWrapper.style.display = 'none';
+            myButton.style.display = 'block';
+            let gameOver =document.createElement('p');
+            gameOver.innerText = ' GAME OVER';
+            gameOver.classList.add('game_over');
+            document.body.appendChild(gameOver);
+
+            for( let i = 0; i < items.length; i ++){
+                switch (items[i].className) {
+                    case 'box_yes':
+                        items[i].classList.remove('box_yes');
+                        items[i].classList.add('box');
+                        items[i].innerText = i+1;
+                        break;
+                    case 'box_no':
+                        items[i].classList.remove('box_no');
+                        items[i].classList.add('box');
+                        items[i].innerText = i+1;
+                        break;
+                    default:
+                        items[i].innerText = i+1;
+                };
+            };
+        };
+        if(guessed === compareItems.length){
+            gameWrapper.style.display = 'none';
+            myButton.style.display = 'block';
+            let gameOver =document.createElement('p');
+            gameOver.innerText = ' YOU ARE WINNER';
+            gameOver.classList.add('game_over');
+            document.body.appendChild(gameOver);
+
+            for( let i = 0; i < items.length; i ++){
+                switch (items[i].className) {
+                    case 'box_yes':
+                        items[i].classList.remove('box_yes');
+                        items[i].classList.add('box');
+                        items[i].innerText = i+1;
+                        break;
+                    case 'box_no':
+                        items[i].classList.remove('box_no');
+                        items[i].classList.add('box');
+                        items[i].innerText = i+1;
+                        break;
+                    default:
+                        items[i].innerText = i+1;
+                };
+            };
+        }
+    };
+
+    function shuffle(array) {
+        let newArray = [];
+        let arrayCopy = array.slice(0,100);
+        let currentIndex = arrayCopy.length, temporaryValue, randomIndex;
+
+        while (0 !== currentIndex) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+            temporaryValue = arrayCopy[currentIndex];
+            arrayCopy[currentIndex] = arrayCopy[randomIndex];
+            arrayCopy[randomIndex] = temporaryValue;
+        };
+        newArray = arrayCopy.slice(0,10);
+        for (let i = 0; i < newArray.length; i++){
+            // newArray[i].style.backgroundColor = 'rgba(200,10,10,.7)';
+        };
+        return newArray;
+    };
+
+    function renderBoxes() {
+        let docFrag = document.createDocumentFragment();
+
+        for (let i = 0; i < items.length; i++) {
+            docFrag.appendChild(items[i]);
+        }
+        gameWrapper.appendChild(docFrag);
+    };
+
+
+
+</script>
+</body>
+</html>
